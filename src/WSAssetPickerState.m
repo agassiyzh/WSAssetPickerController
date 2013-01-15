@@ -21,12 +21,14 @@
 
 @interface WSAssetPickerState ()
 @property (nonatomic, strong) NSMutableOrderedSet *selectedAssetsSet;
+@property (nonatomic, strong) NSMutableOrderedSet *selectedPhotosSet;
 @end
 
 @implementation WSAssetPickerState
 
 @dynamic selectedAssets;
 @synthesize selectedAssetsSet = _selectedAssetsSet;
+@synthesize selectedPhotosSet = _selectedPhotosSet;
 @synthesize selectedCount = _selectedCount;
 @synthesize state = _state;
 
@@ -45,6 +47,7 @@
     // Clear the selcted assets and count.
     if (WSAssetPickerStatePickingAlbum == _state) {
         [self.selectedAssetsSet removeAllObjects];
+        [self.selectedPhotosSet removeAllObjects];
         self.selectedCount = 0;
     }
 }
@@ -57,17 +60,31 @@
     return _selectedAssetsSet;
 }
 
+- (NSMutableOrderedSet *)selectedPhotosSet {
+    if (!_selectedPhotosSet) {
+        _selectedPhotosSet = [NSMutableOrderedSet orderedSet];
+    }
+    
+    return _selectedPhotosSet;
+}
+
 - (NSArray *)selectedAssets
 {
     return [[self.selectedAssetsSet array] copy];
 }
 
-- (void)changeSelectionState:(BOOL)selected forAsset:(ALAsset *)asset
+- (NSArray *)selectedPhotoPaths {
+    return [[self.selectedPhotosSet array] copy];
+}
+
+- (void)changeSelectionState:(BOOL)selected forAsset:(WSAssetWrapper *)assetWrapper
 {
     if (selected) {
-        [self.selectedAssetsSet addObject:asset];
+        [self.selectedAssetsSet addObject:assetWrapper.asset];
+        [self.selectedPhotosSet addObject:assetWrapper.tempPhotoPath];
     } else {
-        [self.selectedAssetsSet removeObject:asset];
+        [self.selectedAssetsSet removeObject:assetWrapper.asset];
+        [self.selectedPhotosSet removeObject:assetWrapper.tempPhotoPath];
     }
     
     // Update the observable count property.

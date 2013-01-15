@@ -21,9 +21,6 @@
 
 @implementation WSAssetWrapper
 
-@synthesize asset = _asset;
-@synthesize selected = _selected;
-
 + (WSAssetWrapper *)wrapperWithAsset:(ALAsset *)asset
 {
     WSAssetWrapper *wrapper = [[WSAssetWrapper alloc] initWithAsset:asset];

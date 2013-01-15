@@ -21,13 +21,44 @@
 #import "WSAssetPickerState.h"
 #import "WSAssetsTableViewCell.h"
 #import "WSAssetWrapper.h"
+#import "NSData+SSToolkitAdditions.h"
+
+
+#define APPLICATION_DOCUMENT_DIRECTORY						[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject]
+static NSString *const kWSSendImageTempDir = @"send_image_temp";
+
+@interface UIImage (YZH)
+
+- (UIImage*)imageWithScale:(CGFloat)scale;
+
+@end
+
+
+
+@implementation UIImage (YZH)
+
+
+- (UIImage*)imageWithScale:(CGFloat)scale {
+    UIGraphicsBeginImageContext(CGSizeMake(self.size.width * scale, self.size.height * scale));
+    [self drawInRect:CGRectMake(0, 0, self.size.width * scale, self.size.height * scale)];
+    UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    
+    return scaledImage;
+}
+@end
+
 
 #define ASSETS_PER_ROW_PORTRAIT 4
 #define ASSETS_PER_ROW_LANDSCAPE 6
 
+static NSInteger kQGLMaxPhotoSelectedNum = 9;
+
 @interface WSAssetTableViewController () <WSAssetsTableViewCellDelegate>
 @property (nonatomic, strong) NSMutableArray *fetchedAssets;
 @property (nonatomic, readonly) NSInteger assetsPerRow;
+@property (nonatomic, strong) UILabel *selectedPhotosNumLabel;
 @end
 
 
@@ -42,6 +73,16 @@
 #pragma mark - View Lifecycle
 
 #define TABLEVIEW_INSETS UIEdgeInsetsMake(2, 0, 2, 0);
+
+- (void)loadView {
+    [super loadView];
+    
+    UIBarButtonItem *numBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.selectedPhotosNumLabel];
+    UIBarButtonItem *spaceBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem *doneBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonAction:)];
+    
+    [self.navigationController setToolbarItems:@[numBarButtonItem, spaceBarButtonItem, doneBarButtonItem] animated:YES];
+}
 
 - (void)viewWillAppear:(BOOL)animated
 {
@@ -58,6 +99,7 @@
     self.assetPickerState.state = WSAssetPickerStatePickingAssets;
     
     DLog(@"\n*********************************\n\nShowing Asset Picker\n\n*********************************");
+    
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -112,6 +154,19 @@
     }
 }
 
+- (UILabel *)selectedPhotosNumLabel {
+    if (!_selectedPhotosNumLabel) {
+        _selectedPhotosNumLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 20.0f)];
+        
+        _selectedPhotosNumLabel.textColor = [UIColor whiteColor];
+        _selectedPhotosNumLabel.text = [NSString stringWithFormat:@"0 / %d", kQGLMaxPhotoSelectedNum];
+        _selectedPhotosNumLabel.backgroundColor = [UIColor clearColor];
+        
+    }
+    
+    return _selectedPhotosNumLabel;
+}
+
 #pragma mark - Rotation
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -161,10 +216,7 @@
         }];
     });
     
-#if __IPHONE_OS_VERSION_MIN_REQUIRED < 60000
     dispatch_release(enumQ);
-#endif
-
     
     [self.tableView performSelector:@selector(reloadData) withObject:nil afterDelay:0.5];
 }
@@ -189,8 +241,54 @@
     WSAssetWrapper *assetWrapper = [self.fetchedAssets objectAtIndex:assetIndex];
     assetWrapper.selected = selected;
     
+    if (selected) {
+        UIImage *scaleImage = [self resizeAndSaveImage:assetWrapper.asset];
+        NSString *tempImagePath = [self pathWithImageSaved:scaleImage];
+        assetWrapper.tempPhotoPath = tempImagePath;
+    }
+
     // Update the state object's selectedAssets.
-    [self.assetPickerState changeSelectionState:selected forAsset:assetWrapper.asset];
+    [self.assetPickerState changeSelectionState:selected forAsset:assetWrapper];
+    
+     self.selectedPhotosNumLabel.text = [NSString stringWithFormat:@"%d/9", self.assetPickerState.selectedCount];
+}
+
+- (UIImage*)resizeAndSaveImage:(ALAsset*)asset {
+    CGImageRef imageRef = [asset.defaultRepresentation fullScreenImage];
+    UIImage *bigImage = [UIImage imageWithCGImage:imageRef];
+    
+    UIImage *scaleImage = nil;
+    if (bigImage.size.width > 640) {
+        scaleImage = [bigImage imageWithScale:(640 / bigImage.size.width)];
+    } else {
+        scaleImage = bigImage;
+    }
+    
+    return scaleImage;
+}
+
+- (NSString*)pathWithImageSaved:(UIImage*)image {
+    NSData *imageData = UIImageJPEGRepresentation(image, 0.7);
+    NSString *sha1 = [imageData SHA1Sum];
+    
+    NSURL *imageTempDir = APPLICATION_DOCUMENT_DIRECTORY;
+    imageTempDir = [imageTempDir URLByAppendingPathComponent:kWSSendImageTempDir];
+    
+    NSError *error = nil;
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:imageTempDir.path]) {
+        [[NSFileManager defaultManager] createDirectoryAtURL:imageTempDir withIntermediateDirectories:YES attributes:nil error:&error];
+        
+        if (error) {
+            NSLog(@"%@",error);
+        }
+    }
+    
+    NSString *filename = [NSString stringWithFormat:@"%@.jpg", sha1];
+    NSURL *imageURL = [imageTempDir URLByAppendingPathComponent:filename];
+    [imageData writeToFile:imageURL.path atomically:YES];
+    
+    return imageURL.path;
 }
 
 
@@ -227,7 +325,8 @@
     
     if (cell == nil) {
         
-        cell = [[WSAssetsTableViewCell alloc] initWithAssets:[self assetsForIndexPath:indexPath] reuseIdentifier:AssetCellIdentifier];        
+        cell = [[WSAssetsTableViewCell alloc] initWithAssets:[self assetsForIndexPath:indexPath] reuseIdentifier:AssetCellIdentifier];
+        cell.assetPickerState = self.assetPickerState;
     } else {
         
         cell.cellAssetViews = [self assetsForIndexPath:indexPath];

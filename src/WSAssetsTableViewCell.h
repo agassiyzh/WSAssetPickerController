@@ -18,6 +18,7 @@
 //  limitations under the License.
 
 #import <UIKit/UIKit.h>
+#import "WSAssetPickerState.h"
 
 @protocol WSAssetsTableViewCellDelegate;
 
@@ -26,6 +27,7 @@
 @property (nonatomic, strong) NSArray *cellAssetViews;
 
 @property (nonatomic, weak) id <WSAssetsTableViewCellDelegate> delegate;
+@property (nonatomic, weak) WSAssetPickerState *assetPickerState;
 
 + (WSAssetsTableViewCell *)assetsCellWithAssets:(NSArray *)assets reuseIdentifier:(NSString *)identifier;
 

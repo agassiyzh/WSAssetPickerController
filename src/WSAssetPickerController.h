@@ -38,6 +38,6 @@
 - (void)assetPickerControllerDidCancel:(WSAssetPickerController *)sender;
 
 // Called when the done button is tapped.
-- (void)assetPickerController:(WSAssetPickerController *)sender didFinishPickingMediaWithAssets:(NSArray *)assets;
+- (void)assetPickerController:(WSAssetPickerController *)sender didFinishPickingMediaWithAssets:(NSArray *)assets tempPhotoPaths:(NSArray*)paths;
 
 @end

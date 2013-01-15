@@ -69,6 +69,7 @@
         WSAssetViewColumn *assetViewColumn = [[WSAssetViewColumn alloc] initWithImage:[UIImage imageWithCGImage:assetWrapper.asset.thumbnail]];
         assetViewColumn.column = [assets indexOfObject:assetWrapper];
         assetViewColumn.selected = assetWrapper.isSelected;
+        assetViewColumn.assetPickerState = self.assetPickerState;
         
         // Observe the column's isSelected property.
         [assetViewColumn addObserver:self forKeyPath:@"isSelected" options:NSKeyValueObservingOptionNew context:NULL];

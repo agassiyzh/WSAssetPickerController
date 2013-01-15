@@ -18,11 +18,14 @@
 //  limitations under the License.
 
 #import <UIKit/UIKit.h>
+#import "WSAssetPickerState.h"
+
 
 @interface WSAssetViewColumn : UIView
 
 @property (nonatomic) NSUInteger column;
 @property (nonatomic, getter=isSelected) BOOL selected;
+@property (nonatomic, weak) WSAssetPickerState *assetPickerState;
 
 + (WSAssetViewColumn *)assetViewWithImage:(UIImage *)thumbnail;
 

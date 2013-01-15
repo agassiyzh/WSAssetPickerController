@@ -107,7 +107,7 @@
             }
         } else if (WSAssetPickerStatePickingDone == self.assetPickerState.state) {
             if ([delegate conformsToProtocol:@protocol(WSAssetPickerControllerDelegate)]) {
-                [delegate assetPickerController:self didFinishPickingMediaWithAssets:self.assetPickerState.selectedAssets];
+                [delegate assetPickerController:self didFinishPickingMediaWithAssets:self.assetPickerState.selectedAssets tempPhotoPaths:self.assetPickerState.selectedPhotoPaths];
             }
         }
     } else if ([SELECTED_COUNT_KEY isEqualToString:keyPath]) {

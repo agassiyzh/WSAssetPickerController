@@ -18,6 +18,7 @@
 //  limitations under the License.
 
 #import <Foundation/Foundation.h>
+#import "WSAssetWrapper.h"
 
 typedef enum {
     WSAssetPickerStateInitializing,
@@ -29,9 +30,10 @@ typedef enum {
 
 @interface WSAssetPickerState : NSObject
 @property (nonatomic, readonly) NSArray *selectedAssets;
+@property (nonatomic, readonly) NSArray *selectedPhotoPaths;
 @property (nonatomic, readwrite) NSUInteger selectedCount;
 @property (nonatomic, readwrite) WSAssetPickingState state;
 
-- (void)changeSelectionState:(BOOL)selected forAsset:(ALAsset *)asset;
+- (void)changeSelectionState:(BOOL)selected forAsset:(WSAssetWrapper *)assetWrapper;
 
 @end

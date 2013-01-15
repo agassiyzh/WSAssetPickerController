@@ -103,7 +103,13 @@
     if (sender.state == UIGestureRecognizerStateEnded) {
         
         // Set the selection state.
-        self.selected = !self.isSelected;
+        if (self.assetPickerState.selectedCount < 9 || self.isSelected) {
+            self.selected = !self.isSelected;
+        }else {
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"最多允许添加9张图片" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            [alertView show];
+        }
+        
     }
 }
 @end

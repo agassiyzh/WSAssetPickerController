@@ -22,6 +22,7 @@
 @interface WSAssetWrapper : NSObject
 
 @property (nonatomic, strong, readonly) ALAsset *asset;
+@property (nonatomic, copy) NSString *tempPhotoPath;
 @property (nonatomic, getter = isSelected) BOOL selected;
 
 + (WSAssetWrapper *)wrapperWithAsset:(ALAsset *)asset;
