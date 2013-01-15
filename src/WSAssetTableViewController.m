@@ -50,8 +50,7 @@ static NSString *const kWSSendImageTempDir = @"send_image_temp";
 @end
 
 
-#define ASSETS_PER_ROW_PORTRAIT 4
-#define ASSETS_PER_ROW_LANDSCAPE 6
+#define ASSET_WIDTH_WITH_PADDING 79.0f
 
 static NSInteger kQGLMaxPhotoSelectedNum = 9;
 
@@ -145,13 +144,7 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
 
 - (NSInteger)assetsPerRow
 {
-    if (self.interfaceOrientation == UIInterfaceOrientationLandscapeLeft || 
-        self.interfaceOrientation == UIInterfaceOrientationLandscapeRight) {
-        
-        return ASSETS_PER_ROW_LANDSCAPE;
-    } else {
-        return ASSETS_PER_ROW_PORTRAIT;
-    }
+    return MAX(1, (NSInteger)floorf(self.tableView.contentSize.width / ASSET_WIDTH_WITH_PADDING));
 }
 
 - (UILabel *)selectedPhotosNumLabel {
