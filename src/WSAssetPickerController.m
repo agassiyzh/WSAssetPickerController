@@ -72,7 +72,7 @@
     
     self.originalStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
     
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:YES];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
     
     // Start observing state changes and selectedCount changes.
     [_assetPickerState addObserver:self forKeyPath:STATE_KEY options:NSKeyValueObservingOptionNew context:NULL];

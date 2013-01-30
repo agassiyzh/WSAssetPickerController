@@ -58,10 +58,13 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
 @property (nonatomic, strong) NSMutableArray *fetchedAssets;
 @property (nonatomic, readonly) NSInteger assetsPerRow;
 @property (nonatomic, strong) UILabel *selectedPhotosNumLabel;
+@property (nonatomic, assign) BOOL hasScrollToBottom;
 @end
 
 
-@implementation WSAssetTableViewController
+@implementation WSAssetTableViewController {
+    __weak UIBarButtonItem *_doneBarButtonItem;
+}
 
 @synthesize assetPickerState = _assetPickerState;
 @synthesize assetsGroup = _assetsGroup;
@@ -78,9 +81,14 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
     
     UIBarButtonItem *numBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.selectedPhotosNumLabel];
     UIBarButtonItem *spaceBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    UIBarButtonItem *doneBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonAction:)];
+    UIBarButtonItem *doneBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStyleDone target:self action:@selector(doneButtonAction:)];
+    _doneBarButtonItem = doneBarButtonItem;
+    _doneBarButtonItem.enabled = NO;
     
     [self.navigationController setToolbarItems:@[numBarButtonItem, spaceBarButtonItem, doneBarButtonItem] animated:YES];
+    [self.navigationController.toolbar setBarStyle:UIBarStyleBlackOpaque];
+    
+    self.hasScrollToBottom = NO;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -116,10 +124,22 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
 {
     self.navigationItem.title = @"Loading";
     
-	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone 
-                                                                                           target:self 
-                                                                                           action:@selector(doneButtonAction:)];
+    UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    cancelButton.frame = CGRectMake(0.0f, 0.0f, 40.0f, 40.0f);
+    [cancelButton setImage:[UIImage imageNamed:@"bbs-cancel"] forState:UIControlStateNormal];
+    [cancelButton addTarget:self action:@selector(cancelAction:) forControlEvents:UIControlEventTouchUpInside];
     
+    //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+    //                                                                                           target:self
+    //                                                                                           action:@selector(cancelButtonAction:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:cancelButton];
+    
+    UIButton *backButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [backButton setFrame:CGRectMake(0.0f, 0.0f, 36.0f, 30.0f)];
+    [backButton setImage:[UIImage imageNamed:@"back.png"] forState:UIControlStateNormal];
+    [backButton addTarget:self action:@selector(_pop:) forControlEvents:UIControlEventTouchDown];
+    
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backButton];
     
     // TableView configuration.
     self.tableView.contentInset = TABLEVIEW_INSETS;
@@ -131,6 +151,9 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
     [self fetchAssets];
 }
 
+- (IBAction)_pop:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
 
 #pragma mark - Getters
 
@@ -149,11 +172,12 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
 
 - (UILabel *)selectedPhotosNumLabel {
     if (!_selectedPhotosNumLabel) {
-        _selectedPhotosNumLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 20.0f)];
+        _selectedPhotosNumLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 200.0f, 20.0f)];
         
         _selectedPhotosNumLabel.textColor = [UIColor whiteColor];
-        _selectedPhotosNumLabel.text = [NSString stringWithFormat:@"0 / %d", kQGLMaxPhotoSelectedNum];
+        _selectedPhotosNumLabel.text = @"可以选择上传多张图片";
         _selectedPhotosNumLabel.backgroundColor = [UIColor clearColor];
+        _selectedPhotosNumLabel.font = [UIFont systemFontOfSize:14.0f];
         
     }
     
@@ -191,7 +215,7 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
                 DLog(@"Done fetching.");
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self.tableView reloadData];
+                    [self scrollToBottom:nil];
                     self.navigationItem.title = [NSString stringWithFormat:@"%@", [self.assetsGroup valueForProperty:ALAssetsGroupPropertyName]];
                 });
                 
@@ -202,7 +226,7 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 
-                [self.fetchedAssets addObject:assetWrapper];
+                [self.fetchedAssets insertObject:assetWrapper atIndex:0];
                 
             });
             
@@ -211,7 +235,19 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
     
     dispatch_release(enumQ);
     
-    [self.tableView performSelector:@selector(reloadData) withObject:nil afterDelay:0.5];
+    [self performSelector:@selector(scrollToBottom:) withObject:nil afterDelay:0.5];
+}
+
+- (IBAction)scrollToBottom:(id)sender {
+    [self.tableView reloadData];
+    NSInteger rowNum = [self.tableView numberOfRowsInSection:0];
+    
+    if (rowNum > 5) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:rowNum - 1 inSection:0];
+        
+        [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+    }
+
 }
 
 #pragma mark - Actions
@@ -219,6 +255,10 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
 - (void)doneButtonAction:(id)sender
 {     
     self.assetPickerState.state = WSAssetPickerStatePickingDone;
+}
+
+- (IBAction)cancelAction:(id)sender {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 
@@ -243,7 +283,13 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
     // Update the state object's selectedAssets.
     [self.assetPickerState changeSelectionState:selected forAsset:assetWrapper];
     
-     self.selectedPhotosNumLabel.text = [NSString stringWithFormat:@"%d/9", self.assetPickerState.selectedCount];
+    if (self.assetPickerState.selectedCount != 0) {
+        [_doneBarButtonItem setTitle:[NSString stringWithFormat:@"完成(%d/9)", self.assetPickerState.selectedCount]];
+        _doneBarButtonItem.enabled = YES;
+    }else {
+        [_doneBarButtonItem setTitle:@"完成"];
+        _doneBarButtonItem.enabled = NO;
+    }
 }
 
 - (UIImage*)resizeAndSaveImage:(ALAsset*)asset {
@@ -264,7 +310,7 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
     NSData *imageData = UIImageJPEGRepresentation(image, 0.7);
     NSString *sha1 = [imageData SHA1Sum];
     
-    NSURL *imageTempDir = APPLICATION_DOCUMENT_DIRECTORY;
+    NSURL *imageTempDir = [NSURL fileURLWithPath:NSTemporaryDirectory() isDirectory:YES];
     imageTempDir = [imageTempDir URLByAppendingPathComponent:kWSSendImageTempDir];
     
     NSError *error = nil;

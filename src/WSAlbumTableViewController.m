@@ -75,9 +75,15 @@
 
     self.navigationItem.title = @"Loading…";
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel 
-                                                                                           target:self 
-                                                                                           action:@selector(cancelButtonAction:)];
+    UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    cancelButton.frame = CGRectMake(0.0f, 0.0f, 40.0f, 40.0f);
+    [cancelButton setImage:[UIImage imageNamed:@"bbs-cancel"] forState:UIControlStateNormal];
+    [cancelButton addTarget:self action:@selector(cancelButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+    
+//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+//                                                                                           target:self 
+//                                                                                           action:@selector(cancelButtonAction:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:cancelButton];
     
     [self.assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
         
@@ -91,10 +97,18 @@
         }
         
         // Add the group to the array.
-        [self.assetGroups addObject:group];
+        
+        NSString *groupName = [group valueForProperty:ALAssetsGroupPropertyName];
+        
+        if ([groupName isEqualToString:@"Camera Roll"] || [groupName isEqualToString:@"相机胶卷"]) {
+            [self.assetGroups insertObject:group atIndex:0];
+        }else {
+            [self.assetGroups addObject:group];
+        }
         
         // Reload the tableview on the main thread.
         dispatch_async(dispatch_get_main_queue(), ^{
+            
             [self.tableView reloadData];
         });
         
