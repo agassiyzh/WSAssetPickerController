@@ -21,6 +21,9 @@
 #import "WSAssetWrapper.h"
 #import "WSAssetViewColumn.h"
 
+@interface WSAssetsTableViewCell ()
+@property (nonatomic, strong) UIView *assetsContainerView;
+@end
 
 @implementation WSAssetsTableViewCell
 
@@ -56,9 +59,24 @@
     }
 }
 
+- (UIView *)assetsContainerView
+{
+    if (_assetsContainerView == nil) {
+        
+        // Create a containing view with flexible margins.
+        _assetsContainerView = [[UIView alloc] initWithFrame:CGRectZero];
+        _assetsContainerView.autoresizingMask =
+        UIViewAutoresizingFlexibleLeftMargin |
+        UIViewAutoresizingFlexibleRightMargin |
+        UIViewAutoresizingFlexibleTopMargin |
+        UIViewAutoresizingFlexibleBottomMargin;
+        [self addSubview:_assetsContainerView];
+    }
+    return _assetsContainerView;
+}
+
 - (void)setCellAssetViews:(NSArray *)assets
 {
-    // Remove the old WSAssetViews.    
     [self stopObserving];
     
     // Create new WSAssetViews
@@ -70,6 +88,11 @@
         assetViewColumn.column = [assets indexOfObject:assetWrapper];
         assetViewColumn.selected = assetWrapper.isSelected;
         assetViewColumn.assetPickerState = self.assetPickerState;
+        
+        __weak __typeof__(self) weakSelf = self;
+        [assetViewColumn setShouldSelectItemBlock:^BOOL(NSInteger column) {
+            return [weakSelf.delegate assetsTableViewCell:weakSelf shouldSelectAssetAtColumn:column];
+        }];
         
         // Observe the column's isSelected property.
         [assetViewColumn addObserver:self forKeyPath:@"isSelected" options:NSKeyValueObservingOptionNew context:NULL];
@@ -95,13 +118,7 @@
     containerFrame.origin.y = (self.frame.size.height - ASSET_VIEW_FRAME.size.height) / 2;
     containerFrame.size.width = containerWidth;
     containerFrame.size.height = ASSET_VIEW_FRAME.size.height;
-    
-    // Create a containing view with flexible margins.
-    UIView *assetsContainerView = [[UIView alloc] initWithFrame:containerFrame];
-    assetsContainerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | 
-    UIViewAutoresizingFlexibleRightMargin | 
-    UIViewAutoresizingFlexibleTopMargin | 
-    UIViewAutoresizingFlexibleBottomMargin;
+    self.assetsContainerView.frame = containerFrame;
     
     CGRect frame = ASSET_VIEW_FRAME;
     
@@ -109,19 +126,16 @@
         
         assetView.frame = frame;
         
-        [assetsContainerView addSubview:assetView];
+        [self.assetsContainerView addSubview:assetView];
         
         // Adjust the frame x-origin of the next assetView.
         frame.origin.x = frame.origin.x + frame.size.width + ASSET_VIEW_PADDING;
     }                                              
-    
-    [self addSubview:assetsContainerView];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
     if ([object isMemberOfClass:[WSAssetViewColumn class]]) {
-        //DLog(@"%@", change);
         
         WSAssetViewColumn *column = (WSAssetViewColumn *)object;
         if ([self.delegate respondsToSelector:@selector(assetsTableViewCell:didSelectAsset:atColumn:)]) {
@@ -130,8 +144,6 @@
         }
     }
 }
-
-
 
 - (void)dealloc
 {

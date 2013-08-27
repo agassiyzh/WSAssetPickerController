@@ -20,10 +20,10 @@
 #import "WSAlbumTableViewController.h"
 #import "WSAssetPickerState.h"
 #import "WSAssetTableViewController.h"
+#import <AssetsLibrary/AssetsLibrary.h>
 
 
 @interface WSAlbumTableViewController ()
-@property (nonatomic, strong) ALAssetsLibrary *assetsLibrary;
 @property (nonatomic, strong) NSMutableArray *assetGroups; // Model (all groups of assets).
 @end
 
@@ -31,19 +31,10 @@
 @implementation WSAlbumTableViewController
 
 @synthesize assetPickerState = _assetPickerState;
-@synthesize assetsLibrary = _assetsLibrary;
 @synthesize assetGroups = _assetGroups;
 
 
-#pragma mark - Getters 
-
-- (ALAssetsLibrary *)assetsLibrary
-{
-    if (!_assetsLibrary) {
-        _assetsLibrary = [[ALAssetsLibrary alloc] init];
-    }
-    return _assetsLibrary;
-}
+#pragma mark - Getters
 
 - (NSMutableArray *)assetGroups
 {
@@ -64,8 +55,6 @@
     self.wantsFullScreenLayout = YES;
     
     self.assetPickerState.state = WSAssetPickerStatePickingAlbum;
-    
-    DLog(@"\n*********************************\n\nShowing Album Picker\n\n*********************************");
 }
 
 
@@ -85,7 +74,7 @@
 //                                                                                           action:@selector(cancelButtonAction:)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:cancelButton];
     
-    [self.assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+    [self.assetPickerState.assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
         
         // If group is nil, the end has been reached.
         if (group == nil) {

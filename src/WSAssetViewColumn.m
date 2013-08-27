@@ -22,6 +22,7 @@
 
 @interface WSAssetViewColumn ()
 @property (nonatomic, weak) UIImageView *selectedView;
+@property (nonatomic, strong) BOOL (^shouldSelectItem)(NSInteger column);
 @end
 
 
@@ -60,6 +61,10 @@
     return self;
 }
 
+- (void)setShouldSelectItemBlock:(BOOL(^)(NSInteger column))shouldSelectItemBlock
+{
+    self.shouldSelectItem = shouldSelectItemBlock;
+}
 
 #pragma mark - Setters/Getters
 
@@ -99,17 +104,16 @@
 
 - (void)userDidTapAction:(UITapGestureRecognizer *)sender
 {   
-    // Tell the delegate.
     if (sender.state == UIGestureRecognizerStateEnded) {
         
         // Set the selection state.
-        if (self.assetPickerState.selectedCount < 9 || self.isSelected) {
-            self.selected = !self.isSelected;
-        }else {
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"最多允许添加9张图片" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-            [alertView show];
-        }
-        
+        BOOL canSelect = YES;
+        if (self.shouldSelectItem)
+            canSelect = self.shouldSelectItem(self.column);
+        self.selected = (canSelect && (self.selected == NO));
+//            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"最多允许添加9张图片" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+//            [alertView show];
     }
 }
+
 @end

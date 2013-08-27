@@ -1,0 +1,10 @@
+PODS:
+  - TSMessages (0.9.3)
+
+DEPENDENCIES:
+  - TSMessages (= 0.9.3)
+
+SPEC CHECKSUMS:
+  TSMessages: e741d102e8291074b4ee7545b53c90ed5f220dd5
+
+COCOAPODS: 0.20.2
