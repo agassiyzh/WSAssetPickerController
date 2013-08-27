@@ -50,12 +50,12 @@
         
 //        ALAssetsLibrary *library = (assetsLibrary) ?: [[ALAssetsLibrary alloc] init];
         self.assetPickerState.assetsLibrary = assetsLibrary;
-    albumTableViewController.assetPickerState = self.assetPickerState;
+        albumTableViewController.assetPickerState = self.assetPickerState;
     }
     
     return self;
 }
-        
+
 - (id)initWithDelegate:(id <WSAssetPickerControllerDelegate>)delegate;
 {
     self = [[[self class] alloc] initWithAssetsLibrary:nil];
@@ -128,7 +128,7 @@
                 [delegate assetPickerControllerDidCancel:self];
             }
         } else if (WSAssetPickerStatePickingDone == self.assetPickerState.state) {
-          if ([delegate respondsToSelector:@selector(assetPickerController:didFinishPickingMediaWithAssets:tempPhotoPaths:)]) {
+            if ([delegate respondsToSelector:@selector(assetPickerController:didFinishPickingMediaWithAssets:tempPhotoPaths:)]) {
                 [delegate assetPickerController:self didFinishPickingMediaWithAssets:self.assetPickerState.selectedAssets tempPhotoPaths:self.assetPickerState.selectedPhotoPaths];
             }
         } else if (WSAssetPickerStateSelectionLimitReached == self.assetPickerState.state) {
