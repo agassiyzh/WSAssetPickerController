@@ -18,28 +18,40 @@
 //  limitations under the License.
 
 #import "WSMainViewController.h"
-#import "WSAssetPicker.h"
 #import <QuartzCore/QuartzCore.h>
+#import "WSAssetPicker.h"
+#import "TSMessage.h"
 
 @interface WSMainViewController () <WSAssetPickerControllerDelegate>
-@property (nonatomic, strong) WSAssetPickerController *pickerController;
+@property (strong, nonatomic) ALAssetsLibrary *assetsLibrary;
+@property (strong, nonatomic) UIActivityIndicatorView *activityView;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UIPageControl *pageControl;
+@property (strong, nonatomic) IBOutlet UIButton *unlimitedPickButton;
+@property (strong, nonatomic) IBOutlet UIButton *limitedPickButton;
 @property (nonatomic, readwrite) BOOL pageControlInUse;
 @end
 
 
 @implementation WSMainViewController
-@synthesize pickerController = _pickerController;
-@synthesize scrollView = _scrollView;
-@synthesize pageControl = _pageControl;
-@synthesize pageControlInUse = _pageControlInUse;
+
+- (UIActivityIndicatorView *)activityView
+{
+    if (_activityView == nil) {
+        
+        _activityView =
+        [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+        [_activityView setColor:[UIColor darkGrayColor]];
+        [self.view addSubview:_activityView];
+    }
+    return _activityView;
+}
 
 - (void)setScrollView:(UIScrollView *)scrollView
 {
-    scrollView.layer.cornerRadius = 5.f;
-    scrollView.layer.borderWidth = 2.f;
-    scrollView.layer.borderColor = [UIColor darkGrayColor].CGColor;
+    scrollView.layer.cornerRadius = 4.f;
+    scrollView.layer.borderWidth = 1.f;
+    scrollView.layer.borderColor = [UIColor colorWithWhite:0.5 alpha:0.5].CGColor;
     _scrollView = scrollView;
 }
 
@@ -49,11 +61,45 @@
     _pageControl = pageControl;
 }
 
-- (IBAction)pick:(id)sender 
+- (void)viewDidLoad
 {
-    self.pickerController = [[WSAssetPickerController alloc] initWithDelegate:self];
+    [super viewDidLoad];
     
-    [self presentViewController:self.pickerController animated:YES completion:NULL];
+    void (^styleButton)(UIButton *) =
+    ^(UIButton *button) {
+        
+        [button setBackgroundColor:[UIColor clearColor]];
+        UIImage *image = [UIImage imageNamed:@"WSButtonBackground"];
+        UIImage *pressedImage = [UIImage imageNamed:@"WSButtonBackgroundPressed"];
+        [button setBackgroundImage:[image resizableImageWithCapInsets:UIEdgeInsetsMake(26, 7, 3, 7)] forState:UIControlStateNormal];
+        [button setBackgroundImage:[pressedImage resizableImageWithCapInsets:UIEdgeInsetsMake(26, 7, 3, 7)] forState:UIControlStateHighlighted];
+    };
+    
+    styleButton(self.unlimitedPickButton);
+    styleButton(self.limitedPickButton);
+}
+
+- (void)viewWillLayoutSubviews
+{
+    [super viewWillLayoutSubviews];
+    
+    CGPoint scrollViewCenter = CGPointMake(self.scrollView.frame.size.width/2, self.scrollView.frame.size.height/2);
+    CGPoint activityCenter = [self.view convertPoint:scrollViewCenter fromView:self.scrollView];
+    
+    self.activityView.center = activityCenter;
+}
+
+- (IBAction)pick:(id)sender
+{
+    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+    self.assetsLibrary = library;
+    
+    WSAssetPickerController *picker = [[WSAssetPickerController alloc] initWithAssetsLibrary:library];
+    picker.delegate = self;
+    if ([sender isEqual:self.limitedPickButton])
+        picker.selectionLimit = 5;
+    
+    [self presentViewController:picker animated:YES completion:NULL];
 }
 
 - (IBAction)changePage:(UIPageControl *)sender
@@ -70,6 +116,11 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+- (BOOL)shouldAutorotate
+{
+    return NO;
+}
+
 
 #pragma mark - WSAssetPickerControllerDelegate Methods
 
@@ -78,49 +129,62 @@
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
+- (void)assetPickerControllerDidLimitSelection:(WSAssetPickerController *)sender
+{
+    if ([TSMessage isNotificationActive] == NO) {
+        [TSMessage showNotificationInViewController:sender withTitle:@"Selection limit reached." withMessage:nil withType:TSMessageNotificationTypeWarning withDuration:2.0];
+    }
+}
+
 - (void)assetPickerController:(WSAssetPickerController *)sender didFinishPickingMediaWithAssets:(NSArray *)assets
 {
+    // Reset the scroll view and page control.
+    [self.scrollView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    self.scrollView.contentSize = CGSizeZero;
+    self.pageControl.numberOfPages = 0;
+    self.pageControl.currentPage = 0;
+    self.pageControl.hidden = YES;
     
-    UIActivityIndicatorView *activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    activityView.center = CGPointMake(self.scrollView.frame.size.width/2, self.scrollView.frame.size.height/2);
-    [self.scrollView addSubview:activityView];
-    [activityView startAnimating];
+    // Show some activity.
+    [self.activityView startAnimating];
     
+    // Dismiss the picker controller.
     [self dismissViewControllerAnimated:YES completion:^{
         
-        if (assets.count < 1) return;
-        
-        CGSize contentSize;
+        if (assets.count == 0) {
+            [self.activityView stopAnimating];
+            [self dismissViewControllerAnimated:YES completion:nil];
+            return;
+        }
+        // ScrollView setup.
+        CGSize contentSize = CGSizeZero;
         contentSize.width = self.scrollView.frame.size.width * assets.count;
         contentSize.height = self.scrollView.frame.size.height;
         self.scrollView.contentSize = contentSize;
-        
-        
+
+        // PageControl setup.
         self.pageControl.hidden = NO;
         self.pageControl.numberOfPages = assets.count;
-        
         
         int index = 0;
         
         for (ALAsset *asset in assets) {
             
-            CGRect imageViewFrame;
-            imageViewFrame.origin.x = self.scrollView.frame.size.width * index;
-            imageViewFrame.origin.y = 0;
-            imageViewFrame.size = self.scrollView.frame.size;
-           
+            CGFloat padding = 10.0;
+            CGRect imageViewFrame = CGRectInset(self.scrollView.bounds, padding, padding);
+            imageViewFrame.origin.x = self.scrollView.frame.size.width * index + padding;
             
             UIImage *image = [[UIImage alloc] initWithCGImage:asset.defaultRepresentation.fullScreenImage];
             UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-            imageView.clipsToBounds = YES;
-            imageView.contentMode = UIViewContentModeScaleAspectFill;
             imageView.frame = imageViewFrame;
-            
+            imageView.contentMode = UIViewContentModeScaleAspectFit;
+
             index++;
             
             [self.scrollView addSubview:imageView];
-            if (index == 0) [activityView stopAnimating];
         }
+        
+        [self.activityView stopAnimating];
         
         [self.scrollView flashScrollIndicators];
     }];

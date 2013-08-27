@@ -105,8 +105,6 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
     
     self.assetPickerState.state = WSAssetPickerStatePickingAssets;
     
-    DLog(@"\n*********************************\n\nShowing Asset Picker\n\n*********************************");
-    
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -205,14 +203,11 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
     // (e.g. if user closes, opens Photos and deletes/takes a photo, we'll get out of range/other error when they come back.
     // IDEA: Perhaps the best solution, since this is a modal controller, is to close the modal controller.
     
-    dispatch_queue_t enumQ = dispatch_queue_create("AssetEnumeration", NULL);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     
-    dispatch_async(enumQ, ^{
-        
         [self.assetsGroup enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
             
             if (!result || index == NSNotFound) {
-                DLog(@"Done fetching.");
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self scrollToBottom:nil];
@@ -233,7 +228,7 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
         }];
     });
     
-    dispatch_release(enumQ);
+    
     
     [self performSelector:@selector(scrollToBottom:) withObject:nil afterDelay:0.5];
 }
@@ -263,6 +258,24 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
 
 
 #pragma mark - WSAssetsTableViewCellDelegate Methods
+
+- (BOOL)assetsTableViewCell:(WSAssetsTableViewCell *)cell shouldSelectAssetAtColumn:(NSUInteger)column
+{
+    BOOL shouldSelectAsset = (self.assetPickerState.selectionLimit == 0 ||
+                              (self.assetPickerState.selectedCount < self.assetPickerState.selectionLimit));
+    
+    NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+    NSUInteger assetIndex = indexPath.row * self.assetsPerRow + column;
+    
+    WSAssetWrapper *assetWrapper = [self.fetchedAssets objectAtIndex:assetIndex];
+    
+    if ((shouldSelectAsset == NO) && (assetWrapper.isSelected == NO))
+        self.assetPickerState.state = WSAssetPickerStateSelectionLimitReached;
+    else
+        self.assetPickerState.state = WSAssetPickerStatePickingAssets;
+    
+    return shouldSelectAsset;
+}
 
 - (void)assetsTableViewCell:(WSAssetsTableViewCell *)cell didSelectAsset:(BOOL)selected atColumn:(NSUInteger)column
 {
@@ -320,13 +333,13 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
         
         if (error) {
             NSLog(@"%@",error);
-        }
+}
     }
-    
+
     NSString *filename = [NSString stringWithFormat:@"%@.jpg", sha1];
     NSURL *imageURL = [imageTempDir URLByAppendingPathComponent:filename];
     [imageData writeToFile:imageURL.path atomically:YES];
-    
+
     return imageURL.path;
 }
 
@@ -335,8 +348,6 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    DLog(@"Num Rows: %d", (self.fetchedAssets.count + self.assetsPerRow - 1) / self.assetsPerRow);
-    
     return (self.fetchedAssets.count + self.assetsPerRow - 1) / self.assetsPerRow;
 }
 
@@ -364,7 +375,7 @@ static NSInteger kQGLMaxPhotoSelectedNum = 9;
     
     if (cell == nil) {
         
-        cell = [[WSAssetsTableViewCell alloc] initWithAssets:[self assetsForIndexPath:indexPath] reuseIdentifier:AssetCellIdentifier];
+        cell = [[WSAssetsTableViewCell alloc] initWithAssets:[self assetsForIndexPath:indexPath] reuseIdentifier:AssetCellIdentifier];        
         cell.assetPickerState = self.assetPickerState;
     } else {
         

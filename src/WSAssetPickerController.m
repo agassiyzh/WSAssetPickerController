@@ -20,6 +20,10 @@
 #import "WSAssetPickerController.h"
 #import "WSAssetPickerState.h"
 #import "WSAlbumTableViewController.h"
+#import <AssetsLibrary/AssetsLibrary.h>
+
+#define STATE_KEY @"state"
+#define SELECTED_COUNT_KEY @"selectedCount"
 
 @interface WSAssetPickerController ()
 @property (nonatomic, strong) WSAssetPickerState *assetPickerState;
@@ -32,31 +36,36 @@
 
 @dynamic selectedAssets;
 
-@synthesize assetPickerState = _assetPickerState;
-@synthesize selectedCount = _selectedCount;
-@synthesize originalStatusBarStyle = _originalStatusBarStyle;
-
-
 #pragma mark - Initialization
 
-- (id)initWithDelegate:(id <WSAssetPickerControllerDelegate>)delegate;
+- (id)initWithAssetsLibrary:(ALAssetsLibrary *)assetsLibrary
 {
     // Create the Album TableView Controller.
     WSAlbumTableViewController *albumTableViewController = [[WSAlbumTableViewController alloc] initWithStyle:UITableViewStylePlain];
-    albumTableViewController.assetPickerState = self.assetPickerState;
     
-    if ((self = [super initWithRootViewController:albumTableViewController])) {
-        
+    self = [super initWithRootViewController:albumTableViewController];
+    if (self) {
         self.navigationBar.barStyle = UIBarStyleBlackTranslucent;
         self.toolbar.barStyle = UIBarStyleBlackTranslucent;
-        self.delegate = delegate;
+        
+//        ALAssetsLibrary *library = (assetsLibrary) ?: [[ALAssetsLibrary alloc] init];
+        self.assetPickerState.assetsLibrary = assetsLibrary;
+    albumTableViewController.assetPickerState = self.assetPickerState;
     }
     
     return self;
 }
+        
+- (id)initWithDelegate:(id <WSAssetPickerControllerDelegate>)delegate;
+{
+    self = [[[self class] alloc] initWithAssetsLibrary:nil];
+    if (self) {
+        self.delegate = delegate;
+    }
+    return self;
+}
 
-#define STATE_KEY @"state"
-#define SELECTED_COUNT_KEY @"selectedCount"
+#pragma mark - Accessors -
 
 - (WSAssetPickerState *)assetPickerState
 {
@@ -65,6 +74,21 @@
     }
     return _assetPickerState;
 }
+
+- (void)setSelectionLimit:(NSInteger)selectionLimit
+{
+    if (_selectionLimit != selectionLimit) {
+        _selectionLimit = selectionLimit;
+        self.assetPickerState.selectionLimit = _selectionLimit;
+    }
+}
+
+- (NSArray *)selectedAssets
+{
+    return self.assetPickerState.selectedAssets;
+}
+
+#pragma mark - Overrides -
 
 - (void)viewWillAppear:(BOOL)animated
 {
@@ -96,24 +120,25 @@
     
     if ([STATE_KEY isEqualToString:keyPath]) {     
         
-        DLog(@"State Changed: %@", change);
-        
         // Cast the delegate to the assetPickerDelegate.
         id <WSAssetPickerControllerDelegate> delegate = (id <WSAssetPickerControllerDelegate>)self.delegate;
         
         if (WSAssetPickerStatePickingCancelled == self.assetPickerState.state) {
-            if ([delegate conformsToProtocol:@protocol(WSAssetPickerControllerDelegate)]) {
+            if ([delegate respondsToSelector:@selector(assetPickerControllerDidCancel:)]) {
                 [delegate assetPickerControllerDidCancel:self];
             }
         } else if (WSAssetPickerStatePickingDone == self.assetPickerState.state) {
-            if ([delegate conformsToProtocol:@protocol(WSAssetPickerControllerDelegate)]) {
+            if ([delegate respondsToSelector:@selector(assetPickerController:didFinishPickingMediaWithAssets:)]) {
                 [delegate assetPickerController:self didFinishPickingMediaWithAssets:self.assetPickerState.selectedAssets tempPhotoPaths:self.assetPickerState.selectedPhotoPaths];
+            }
+        } else if (WSAssetPickerStateSelectionLimitReached == self.assetPickerState.state) {
+            if ([delegate respondsToSelector:@selector(assetPickerControllerDidLimitSelection:)]) {
+                [delegate assetPickerControllerDidLimitSelection:self];
             }
         }
     } else if ([SELECTED_COUNT_KEY isEqualToString:keyPath]) {
         
         self.selectedCount = self.assetPickerState.selectedCount;
-        DLog(@"Total selected: %d", self.assetPickerState.selectedCount);
     }
 }
 

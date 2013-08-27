@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		0D8AE762D8B74582B9AD2ECF /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DF8C127AA6E74EA5B04B6C1D /* libPods.a */; };
 		4AE5CCE8156AB810004C2AB7 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AE5CCE7156AB810004C2AB7 /* QuartzCore.framework */; };
 		DE017CF9155EC92F002E7BB0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE017CF8155EC92F002E7BB0 /* UIKit.framework */; };
 		DE017CFB155EC92F002E7BB0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE017CFA155EC92F002E7BB0 /* Foundation.framework */; };
@@ -51,6 +52,10 @@
 		DEC2AE1415C5D6270078B2C7 /* WSAssetViewSelectionIndicator.png in Resources */ = {isa = PBXBuildFile; fileRef = DEC2AE0B15C5D6270078B2C7 /* WSAssetViewSelectionIndicator.png */; };
 		DEC2AE1515C5D6270078B2C7 /* WSAssetViewSelectionIndicator@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DEC2AE0C15C5D6270078B2C7 /* WSAssetViewSelectionIndicator@2x.png */; };
 		DEC2AE1615C5D6270078B2C7 /* WSMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DEC2AE0E15C5D6270078B2C7 /* WSMainViewController.m */; };
+		DEDF87571753077200D9A9A4 /* WSButtonBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = DEDF87531753077200D9A9A4 /* WSButtonBackground.png */; };
+		DEDF87581753077200D9A9A4 /* WSButtonBackground@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DEDF87541753077200D9A9A4 /* WSButtonBackground@2x.png */; };
+		DEDF87591753077200D9A9A4 /* WSButtonBackgroundPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = DEDF87551753077200D9A9A4 /* WSButtonBackgroundPressed.png */; };
+		DEDF875A1753077200D9A9A4 /* WSButtonBackgroundPressed@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DEDF87561753077200D9A9A4 /* WSButtonBackgroundPressed@2x.png */; };
 		DEEC0FF3156B32B600B1F0D2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE017CFA155EC92F002E7BB0 /* Foundation.framework */; };
 		DEEC1017156B332900B1F0D2 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE7FF813155ECB0A00D7B3E8 /* AssetsLibrary.framework */; };
 		DEEC1018156B333600B1F0D2 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE017CF8155EC92F002E7BB0 /* UIKit.framework */; };
@@ -60,12 +65,13 @@
 
 /* Begin PBXFileReference section */
 		4AE5CCE7156AB810004C2AB7 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		8F346C66E3694462A33E62E2 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		DE017CF4155EC92F002E7BB0 /* Picker Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Picker Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE017CF8155EC92F002E7BB0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		DE017CFA155EC92F002E7BB0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		DE017CFC155EC92F002E7BB0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		DE017D10155EC930002E7BB0 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		DE0C6ECC1659592D00ED8496 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		DE0C6ECC1659592D00ED8496 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "../Default-568h@2x.png"; sourceTree = "<group>"; };
 		DE7FF813155ECB0A00D7B3E8 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		DE960F5515C5F84C00BB5E0B /* WSAssetPicker-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WSAssetPicker-Prefix.pch"; sourceTree = "<group>"; };
 		DEBD0F1C15C5DDE600B9C9B5 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
@@ -96,7 +102,12 @@
 		DEC2AE0C15C5D6270078B2C7 /* WSAssetViewSelectionIndicator@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WSAssetViewSelectionIndicator@2x.png"; sourceTree = "<group>"; };
 		DEC2AE0D15C5D6270078B2C7 /* WSMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WSMainViewController.h; sourceTree = "<group>"; };
 		DEC2AE0E15C5D6270078B2C7 /* WSMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WSMainViewController.m; sourceTree = "<group>"; };
+		DEDF87531753077200D9A9A4 /* WSButtonBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = WSButtonBackground.png; sourceTree = "<group>"; };
+		DEDF87541753077200D9A9A4 /* WSButtonBackground@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WSButtonBackground@2x.png"; sourceTree = "<group>"; };
+		DEDF87551753077200D9A9A4 /* WSButtonBackgroundPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = WSButtonBackgroundPressed.png; sourceTree = "<group>"; };
+		DEDF87561753077200D9A9A4 /* WSButtonBackgroundPressed@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WSButtonBackgroundPressed@2x.png"; sourceTree = "<group>"; };
 		DEEC0FF2156B32B600B1F0D2 /* libWSAssetPicker.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libWSAssetPicker.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF8C127AA6E74EA5B04B6C1D /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +121,7 @@
 				DE017CF9155EC92F002E7BB0 /* UIKit.framework in Frameworks */,
 				DE017CFB155EC92F002E7BB0 /* Foundation.framework in Frameworks */,
 				DE017CFD155EC92F002E7BB0 /* CoreGraphics.framework in Frameworks */,
+				0D8AE762D8B74582B9AD2ECF /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,11 +141,11 @@
 		DE017CE9155EC92F002E7BB0 = {
 			isa = PBXGroup;
 			children = (
-				DE0C6ECC1659592D00ED8496 /* Default-568h@2x.png */,
 				DEC2ADE115C5D5D60078B2C7 /* src */,
 				DEC2AE0215C5D6270078B2C7 /* demo */,
 				DE017CF7155EC92F002E7BB0 /* Frameworks */,
 				DE017CF5155EC92F002E7BB0 /* Products */,
+				8F346C66E3694462A33E62E2 /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -155,6 +167,7 @@
 				DE017CFA155EC92F002E7BB0 /* Foundation.framework */,
 				DE017CFC155EC92F002E7BB0 /* CoreGraphics.framework */,
 				DE017D10155EC930002E7BB0 /* SenTestingKit.framework */,
+				DF8C127AA6E74EA5B04B6C1D /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -198,6 +211,11 @@
 		DEC2AE1715C5D6320078B2C7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				DEDF87531753077200D9A9A4 /* WSButtonBackground.png */,
+				DEDF87541753077200D9A9A4 /* WSButtonBackground@2x.png */,
+				DEDF87551753077200D9A9A4 /* WSButtonBackgroundPressed.png */,
+				DEDF87561753077200D9A9A4 /* WSButtonBackgroundPressed@2x.png */,
+				DE0C6ECC1659592D00ED8496 /* Default-568h@2x.png */,
 				DEBD0F1C15C5DDE600B9C9B5 /* Icon.png */,
 				DEBD0F1D15C5DDE600B9C9B5 /* Icon@2x.png */,
 				DEC2AE0515C5D6270078B2C7 /* main.m */,
@@ -244,9 +262,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DE017D21155EC930002E7BB0 /* Build configuration list for PBXNativeTarget "Picker Demo" */;
 			buildPhases = (
+				862712CA7B4249E2B9782464 /* Check Pods Manifest.lock */,
 				DE017CF0155EC92F002E7BB0 /* Sources */,
 				DE017CF1155EC92F002E7BB0 /* Frameworks */,
 				DE017CF2155EC92F002E7BB0 /* Resources */,
+				A85B7853C35840A09505658E /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -315,12 +335,44 @@
 				DEBD0F1E15C5DDE600B9C9B5 /* Icon.png in Resources */,
 				DEBD0F1F15C5DDE600B9C9B5 /* Icon@2x.png in Resources */,
 				DE0C6ECD1659592D00ED8496 /* Default-568h@2x.png in Resources */,
+				DEDF87571753077200D9A9A4 /* WSButtonBackground.png in Resources */,
+				DEDF87581753077200D9A9A4 /* WSButtonBackground@2x.png in Resources */,
+				DEDF87591753077200D9A9A4 /* WSButtonBackgroundPressed.png in Resources */,
+				DEDF875A1753077200D9A9A4 /* WSButtonBackgroundPressed@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		862712CA7B4249E2B9782464 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+		};
+		A85B7853C35840A09505658E /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+		};
 		DEC0BC5B164F3FFC0078003F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -424,6 +476,7 @@
 		};
 		DE017D22155EC930002E7BB0 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8F346C66E3694462A33E62E2 /* Pods.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "demo/WSAssetPickerController-Prefix.pch";
@@ -436,6 +489,7 @@
 		};
 		DE017D23155EC930002E7BB0 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8F346C66E3694462A33E62E2 /* Pods.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "demo/WSAssetPickerController-Prefix.pch";
