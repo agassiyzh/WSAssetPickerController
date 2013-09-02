@@ -1,10 +1,16 @@
 PODS:
+  - MBProgressHUD (0.7)
+  - SSToolkit (1.0.4)
   - TSMessages (0.9.3)
 
 DEPENDENCIES:
+  - MBProgressHUD
+  - SSToolkit
   - TSMessages (= 0.9.3)
 
 SPEC CHECKSUMS:
+  MBProgressHUD: 1fd8591a2216d5dec6de24e09187bb03bcbe9946
+  SSToolkit: 689acaedac79c2079e492e528a55bcb5db9d98c4
   TSMessages: e741d102e8291074b4ee7545b53c90ed5f220dd5
 
-COCOAPODS: 0.20.2
+COCOAPODS: 0.23.0

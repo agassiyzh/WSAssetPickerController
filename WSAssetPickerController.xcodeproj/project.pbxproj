@@ -515,6 +515,7 @@
 		};
 		DEEC100F156B32B600B1F0D2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8F346C66E3694462A33E62E2 /* Pods.xcconfig */;
 			buildSettings = {
 				DEAD_CODE_STRIPPING = NO;
 				DSTROOT = /tmp/WSAssetPicker.dst;
@@ -532,6 +533,7 @@
 		};
 		DEEC1010156B32B600B1F0D2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8F346C66E3694462A33E62E2 /* Pods.xcconfig */;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = NO;
