@@ -337,7 +337,7 @@ static NSString *const kWSSendImageTempDir = @"send_image_temp";
 
 
   if (self.assetPickerState.selectedCount != 0) {
-    [_doneBarButtonItem setTitle:[NSString stringWithFormat:@"完成(%d/9)", self.assetPickerState.selectedCount]];
+    [_doneBarButtonItem setTitle:[NSString stringWithFormat:@"完成(%d/%d)", self.assetPickerState.selectedCount, self.assetPickerState.selectionLimit]];
     _doneBarButtonItem.enabled = YES;
   } else {
     [_doneBarButtonItem setTitle:@"完成"];
