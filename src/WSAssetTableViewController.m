@@ -290,7 +290,7 @@ static NSString *const kWSSendImageTempDir = @"send_image_temp";
 
   __block WSAssetWrapper *assetWrapper = [self.fetchedAssets objectAtIndex:assetIndex];
 
-  assetWrapper.tempPhotoPath = @"";
+  if(selected) assetWrapper.tempPhotoPath = @"";
 
   assetWrapper.selected = selected;
 
@@ -301,20 +301,18 @@ static NSString *const kWSSendImageTempDir = @"send_image_temp";
       UIImage  *scaleImage    = [self resizeAndSaveImage:assetWrapper.asset];
       NSString *tempImagePath = [self pathWithImageSaved:scaleImage];
 
-
-
       ++_resizingImageNumber;
 
       NIDINFO(@"[Agassi]: dispatch sub queue _resizingImageNumber=%d",_resizingImageNumber);
       assetWrapper.tempPhotoPath = tempImagePath;
 
-      [self.assetPickerState changeSelectionState:selected forAsset:assetWrapper];
-
       dispatch_async(dispatch_get_main_queue(), ^{
 
         --_resizingImageNumber;
 
-        NIDINFO(@"[Agassi]: dispatch main queue _resizingImageNumber=%d",_resizingImageNumber);
+        NIDINFO(@"[Agassi]: dispatch main queue _resizingImageNumber=%d\ntemp path=%@",_resizingImageNumber, tempImagePath);
+
+        [self.assetPickerState changeSelectionState:selected forAsset:assetWrapper];
 
         if (_resizingImageNumber == 0 && _doneButtonClicked) {
           [self doneButtonAction:nil];
@@ -332,9 +330,6 @@ static NSString *const kWSSendImageTempDir = @"send_image_temp";
   }
 
   // Update the state object's selectedAssets.
-
-
-
 
   if (self.assetPickerState.selectedCount != 0) {
     [_doneBarButtonItem setTitle:[NSString stringWithFormat:@"完成(%d/%d)", self.assetPickerState.selectedCount, self.assetPickerState.selectionLimit]];
