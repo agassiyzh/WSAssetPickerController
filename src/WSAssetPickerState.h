@@ -34,6 +34,7 @@ typedef enum {
 @property (nonatomic, strong) ALAssetsLibrary *assetsLibrary;
 @property (nonatomic, readonly) NSArray *selectedAssets;
 @property (nonatomic, readonly) NSArray *selectedPhotoPaths;
+@property (nonatomic, readonly) NSArray *thumbPaths;
 @property (nonatomic, readwrite) NSUInteger selectedCount;
 @property (nonatomic, readwrite) NSInteger selectionLimit;
 @property (nonatomic, readwrite) WSAssetPickingState state;

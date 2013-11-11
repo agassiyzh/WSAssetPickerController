@@ -119,7 +119,12 @@
         [delegate assetPickerControllerDidCancel:self];
       }
     } else if (WSAssetPickerStatePickingDone == self.assetPickerState.state) {
-      if ([delegate respondsToSelector:@selector(assetPickerController:didFinishPickingMediaWithAssets:tempPhotoPaths:)]) {
+      if ([delegate respondsToSelector:@selector(assetPickerController:didFinishPickingMediaWithAssets:tempPhotoPaths:thumbnails:)]) {
+        [delegate assetPickerController:self
+        didFinishPickingMediaWithAssets:self.assetPickerState.selectedAssets
+                         tempPhotoPaths:self.assetPickerState.selectedPhotoPaths
+                             thumbnails:self.assetPickerState.thumbPaths];
+      }else if ([delegate respondsToSelector:@selector(assetPickerController:didFinishPickingMediaWithAssets:tempPhotoPaths:)]) {
         [delegate assetPickerController:self
         didFinishPickingMediaWithAssets:self.assetPickerState.selectedAssets
                          tempPhotoPaths:self.assetPickerState.selectedPhotoPaths];

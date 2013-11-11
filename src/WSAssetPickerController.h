@@ -85,6 +85,8 @@
  */
 - (void)assetPickerController:(WSAssetPickerController *)sender didFinishPickingMediaWithAssets:(NSArray *)assets tempPhotoPaths:(NSArray*)paths;
 
+- (void)assetPickerController:(WSAssetPickerController *)sender didFinishPickingMediaWithAssets:(NSArray *)assets tempPhotoPaths:(NSArray*)paths thumbnails:(NSArray*)thumbs;
+
 /** 
  Tells the delegate that the user attempted to select more than the `selectionLimit`.
 

@@ -300,11 +300,13 @@ static NSString *const kWSSendImageTempDir = @"send_image_temp";
     dispatch_async( queue , ^{
       UIImage  *scaleImage    = [self resizeAndSaveImage:assetWrapper.asset];
       NSString *tempImagePath = [self pathWithImageSaved:scaleImage];
+      NSString *thumbPath = [self saveThumbWithAsset:assetWrapper.asset];
 
       ++_resizingImageNumber;
 
       NIDINFO(@"[Agassi]: dispatch sub queue _resizingImageNumber=%d",_resizingImageNumber);
       assetWrapper.tempPhotoPath = tempImagePath;
+      assetWrapper.thumbPath = thumbPath;
 
       dispatch_async(dispatch_get_main_queue(), ^{
 
@@ -356,7 +358,7 @@ static NSString *const kWSSendImageTempDir = @"send_image_temp";
 }
 
 - (NSString *)pathWithImageSaved:(UIImage *)image {
-  NSData   *imageData = UIImageJPEGRepresentation(image, 0.7);
+  NSData   *imageData = UIImageJPEGRepresentation(image, 0.85);
   NSString *sha1      = [imageData SHA1Sum];
 
   NSURL *imageTempDir = [NSURL fileURLWithPath:NSTemporaryDirectory() isDirectory:YES];
@@ -376,6 +378,32 @@ static NSString *const kWSSendImageTempDir = @"send_image_temp";
   NSURL    *imageURL = [imageTempDir URLByAppendingPathComponent:filename];
   [imageData writeToFile:imageURL.path atomically:YES];
 
+  return imageURL.path;
+}
+
+- (NSString *)saveThumbWithAsset:(ALAsset*)asset {
+  CGImageRef thumbRef = asset.thumbnail;
+  UIImage *thumb = [UIImage imageWithCGImage:thumbRef];
+  NSData *thumbData = UIImageJPEGRepresentation(thumb, 0.7f);
+  NSString *sha1 = [thumbData SHA1Sum];
+  
+  NSURL *imageTempDir = [NSURL fileURLWithPath:NSTemporaryDirectory() isDirectory:YES];
+  imageTempDir = [imageTempDir URLByAppendingPathComponent:kWSSendImageTempDir];
+  
+  NSError *error = nil;
+  
+  if (![[NSFileManager defaultManager] fileExistsAtPath:imageTempDir.path]) {
+    [[NSFileManager defaultManager] createDirectoryAtURL:imageTempDir withIntermediateDirectories:YES attributes:nil error:&error];
+    
+    if (error) {
+      NSLog(@"%@", error);
+    }
+  }
+  
+  NSString *filename = [NSString stringWithFormat:@"%@_thumbnail.jpg", sha1];
+  NSURL    *imageURL = [imageTempDir URLByAppendingPathComponent:filename];
+  [thumbData writeToFile:imageURL.path atomically:YES];
+  
   return imageURL.path;
 }
 

@@ -24,6 +24,7 @@
 
 @property (nonatomic, strong, readonly) ALAsset *asset;
 @property (nonatomic, copy) NSString *tempPhotoPath;
+@property (nonatomic, copy) NSString *thumbPath;
 @property (nonatomic, getter = isSelected) BOOL selected;
 
 + (WSAssetWrapper *)wrapperWithAsset:(ALAsset *)asset;
