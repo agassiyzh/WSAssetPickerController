@@ -21,7 +21,8 @@
 #import "WSAssetTableViewController.h"
 #import "WSAssetPickerState.h"
 #import "WSAssetsTableViewCell.h"
-#import "NSData+SSToolkitAdditions.h"
+//#import "NSData+SSToolkitAdditions.h"
+#import <Nimbus/NIFoundationMethods.h>
 #import "MBProgressHUD.h"
 
 
@@ -359,7 +360,7 @@ static NSString *const kWSSendImageTempDir = @"send_image_temp";
 
 - (NSString *)pathWithImageSaved:(UIImage *)image {
   NSData   *imageData = UIImageJPEGRepresentation(image, 0.85);
-  NSString *sha1      = [imageData SHA1Sum];
+  NSString *sha1      = NISHA1HashFromData(imageData);
 
   NSURL *imageTempDir = [NSURL fileURLWithPath:NSTemporaryDirectory() isDirectory:YES];
   imageTempDir = [imageTempDir URLByAppendingPathComponent:kWSSendImageTempDir];
@@ -385,7 +386,7 @@ static NSString *const kWSSendImageTempDir = @"send_image_temp";
   CGImageRef thumbRef = asset.thumbnail;
   UIImage *thumb = [UIImage imageWithCGImage:thumbRef];
   NSData *thumbData = UIImageJPEGRepresentation(thumb, 0.7f);
-  NSString *sha1 = [thumbData SHA1Sum];
+  NSString *sha1 = NISHA1HashFromData(thumbData);
   
   NSURL *imageTempDir = [NSURL fileURLWithPath:NSTemporaryDirectory() isDirectory:YES];
   imageTempDir = [imageTempDir URLByAppendingPathComponent:kWSSendImageTempDir];
